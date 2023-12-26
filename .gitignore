@@ -60,6 +60,7 @@ coverage.xml
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
+*.http
 
 # Flask stuff:
 instance/
@@ -146,5 +147,7 @@ dmypy.json
 .mypy_cache
 
 # папки со статикой и медиа
-media/
+static/
 yatube_api/posts/static/
+media/
+
