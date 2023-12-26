@@ -45,3 +45,11 @@ class Comment(models.Model):
         'Дата добавления', auto_now_add=True, db_index=True
     )
 
+
+class Follow(models.Model):
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='follower'
+    ),
+    following = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='following'
+    )
