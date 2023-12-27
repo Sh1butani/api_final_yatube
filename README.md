@@ -85,4 +85,4 @@ GET /api/v1/follow/
 по адресу: [http://127.0.0.1:8000/redoc/](http://127.0.0.1:8000/redoc/) 
 
 ### Автор:
-[David Pilosyan](t.me/Shibutani)
+[David Pilosyan](https://t.me/Shibutani)
