@@ -1,5 +1,6 @@
 from django.shortcuts import get_object_or_404
-from rest_framework import viewsets, permissions
+from rest_framework import viewsets, permissions, filters
+from rest_framework.pagination import LimitOffsetPagination
 
 from api.permissions import IsAuthorOrReadOnly
 from posts.models import Post, Group
@@ -20,6 +21,7 @@ class PostViewSet(viewsets.ModelViewSet):
     permission_classes = (
         permissions.IsAuthenticatedOrReadOnly, IsAuthorOrReadOnly,
     )
+    pagination_class = LimitOffsetPagination
 
     def perform_create(self, serializer):
         """Создает запись, в которой автором является текущий пользователь."""
@@ -52,7 +54,20 @@ class CommentViewSet(viewsets.ModelViewSet):
             post=get_post(self)
         )
 
-    class FollowViewSet(viewsets.ModelViewSet):
-        """ViewSet для объектов модели Follow."""
-        serializer_class = FollowSerializer
-        permission_classes = (permissions.IsAuthenticated,)
+
+class FollowViewSet(viewsets.ModelViewSet):
+    """ViewSet для объектов модели Follow."""
+    serializer_class = FollowSerializer
+    permission_classes = (permissions.IsAuthenticated,)
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('following__username',)
+
+    def get_queryset(self):
+        """Возвращает queryset c подписками для текущего пользователя."""
+        return self.request.user.follower.all()
+
+    def perform_create(self, serializer):
+        """
+        Создает подписку, в которой подписчиком является текущий пользователь.
+        """
+        serializer.save(user=self.request.user)
