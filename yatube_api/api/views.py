@@ -7,20 +7,13 @@ from posts.models import Post, Group
 from .serializers import (
     PostSerializer, GroupSerializer, CommentSerializer, FollowSerializer
 )
+from .viewsets import BasePostAuthorViewSet, BaseCommentAuthorViewSet
 
 
-class PostViewSet(viewsets.ModelViewSet):
+class PostViewSet(BasePostAuthorViewSet):
     """ViewSet для объектов модели Post."""
     queryset = Post.objects.all()
     serializer_class = PostSerializer
-    permission_classes = (
-        permissions.IsAuthenticatedOrReadOnly, IsAuthorOrReadOnly,
-    )
-    pagination_class = LimitOffsetPagination
-
-    def perform_create(self, serializer):
-        """Создает запись, в которой автором является текущий пользователь."""
-        serializer.save(author=self.request.user)
 
 
 class GroupViewSet(viewsets.ReadOnlyModelViewSet):
@@ -30,29 +23,9 @@ class GroupViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = (permissions.AllowAny,)
 
 
-class CommentViewSet(viewsets.ModelViewSet):
+class CommentViewSet(BaseCommentAuthorViewSet):
     """ViewSet для объектов модели Comment."""
     serializer_class = CommentSerializer
-    permission_classes = (
-        permissions.IsAuthenticatedOrReadOnly, IsAuthorOrReadOnly,
-    )
-
-    def get_post(self):
-        """Получает объект поста."""
-        return get_object_or_404(Post, pk=self.kwargs.get('post_id'))
-
-    def get_queryset(self):
-        """Возвращает queryset c комментариями к текущей записи."""
-        return self.get_post().comments.all()
-
-    def perform_create(self, serializer):
-        """
-        Создает комментарий, в котором автором является текущий пользователь.
-        """
-        serializer.save(
-            author=self.request.user,
-            post=self.get_post()
-        )
 
 
 class FollowViewSet(
